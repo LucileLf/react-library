@@ -1,0 +1,29 @@
+.book{
+    flex-basis: calc(20%);
+    margin: 10px;
+    width: 280px;
+    height: 560px;
+    cursor: pointer;
+    &:hover{
+      opacity: 0.9;
+    }
+    .book-cover{
+      height: 80%;
+      width: 100%;
+      background-color: rgba(128, 128, 128, 0.511);
+      background-size: cover;
+      background-position: center;
+    }
+  
+    .book-info{
+      .book-title{
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+      .book-price{
+        text-align: right;
+      }
+    }
+  
+  }
+  

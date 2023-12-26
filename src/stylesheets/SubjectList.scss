@@ -1,0 +1,13 @@
+.subject-list{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 0%;
+    .subject{
+        width: 100%;
+        .subject-btn{
+            width: 100%;
+            border-radius: 0%;
+        }
+    }
+}
