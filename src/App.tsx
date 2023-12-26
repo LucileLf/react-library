@@ -7,10 +7,14 @@ import { Book } from "./hooks/useBooks";
 import { Route, Routes } from "react-router-dom";
 import SubjectList from "./components/SubjectList";
 
+interface BookQuery {
+  subject: string | null;
+  searchInput: string | null;
+}
 
 function App() {
   //const [bookData, setBookData] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("Harry Potter");
+  const [bookQuery, setBookQuery] = useState<BookQuery>({subject: null, searchInput: "Harry Potter"});
   // à modifier
   const [cartItems, setCartItems] = useState<Book[]>([]);
 
