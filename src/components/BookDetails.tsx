@@ -3,41 +3,48 @@ import useBooks, { Book } from "../hooks/useBooks";
 import { useParams } from "react-router-dom";
 import { BookQuery } from "../App";
 import { Card, CardBody, Image, Heading, Flex, HStack, Box, Text, Badge, Button } from "@chakra-ui/react";
+import noImage from '../assets/no-image-placeholder.webp'
+import { MdAddShoppingCart } from "react-icons/md";
 
-const BookDetails = () => {
+interface BookDetailsProps {
+    onAddToCart: (book: Book) => void;
+  }
+
+const BookDetails = ({onAddToCart}: BookDetailsProps) => {
     const params = useParams();
     const bookId = params.id;
   
     const { books, error, isLoading } = useBooks({subject:"", searchInput: bookId || ""});
-
-    if (!books) return null;
+//if loading...
+    if (!books) return <Text>Une erreur s'est produite. Réessayez.</Text>;
     
     const book: Book = books[0];
-
-    console.log(book);
+console.log(book);
 
     return (
-<Image src={book.cover_i}></Image>
-        // <Card width="300px">
-        //   <CardBody display='flex' flexDirection='column' alignItems='center' borderRadius={10} height="40vh" width="100%">
-        //     <Image src={book.cover_i ? `https://covers.openlibrary.org/b/id/${book.cover_i}.jpg` : noImage } height='80%'></Image>
-        //     <Heading fontSize="2xl" whiteSpace='normal'>{book.title}</Heading>
-        //     <Flex flexDirection="column" alignItems="center" width="100%">
-        //         <Text fontSize="2xl" whiteSpace="normal" textAlign="left">
-        //           de {book.author_name}
-        //         </Text>
-        //     </Flex>
-        //     <HStack justifyContent="space-between" width="100%">
-        //       <Box>
-        //         <Badge colorScheme='green'>
-        //           {book.ratings_average}
-        //         </Badge>
-        //         {book.ratings_average ? `(${book.ratings_count} avis)` : "Soyez le premier à laisser votre avis"}
-        //       </Box>
-        //       <Button colorScheme='teal' size='sm' onClick={()=>onAddToCart(book)}> <MdAddShoppingCart /> </Button>
-        //     </HStack>
-        //   </CardBody>
-        // </Card>
+//<Image src={book.cover_i ? `https://covers.openlibrary.org/b/id/${book.cover_i}.jpg` : noImage } height='80%'></Image>
+        <Card width="70vw" margin="auto">
+          <CardBody display='flex' flexDirection='row' alignItems='center' borderRadius={10} height="40vh" width="100%">
+            <Image flex="1" src={book.cover_i ? `https://covers.openlibrary.org/b/id/${book.cover_i}.jpg` : noImage }></Image>
+            <Flex flexDirection="column" width="45%" marginX="5%" justifyContent="space-between" >
+                <Heading fontSize="3xl" whiteSpace='normal' >{book.title}</Heading>
+                <Text fontSize="2xl" whiteSpace="normal" textAlign="left">
+                  Auteur: {book.author_name}
+                </Text>
+                <Text fontSize="xl" whiteSpace="normal" textAlign="left">
+                  Date: {book.first_publish_year}
+                </Text>
+                <Flex>  
+                    <Badge  fontSize="l" colorScheme='green'>
+                    Note: {book.ratings_average}
+                    </Badge>
+                    {book.ratings_average ? `(${book.ratings_count} avis)` : "Soyez le premier à laisser votre avis"}
+                </Flex>
+                <Button fontSize="l" marginTop="2vh" width="fit-content" colorScheme='teal' size='sm' onClick={()=>onAddToCart(book)}> <MdAddShoppingCart />  Ajouter au panier</Button>
+            
+            </Flex>
+          </CardBody>
+        </Card>
         );
 };  
 

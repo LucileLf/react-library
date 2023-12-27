@@ -57,7 +57,7 @@ function App() {
           //path={`/works/${book}`}
           path="/books/works/:id"
           element={
-            <BookDetails />
+            <BookDetails onAddToCart={(book) => setCartItems([...cartItems, book])} />
           }
         />
 
