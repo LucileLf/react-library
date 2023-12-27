@@ -4,20 +4,22 @@ import "../stylesheets/BookGrid.scss";
 import BookCard from "./BookCard";
 import BookCardSkeleton from "./BookCardSkeleton";
 import GameCardContainer from "./GameCardContainer";
+import { BookQuery } from "../App";
+import { Link } from "react-router-dom";
 
 interface BookGridProps {
-  searchQuery: string;
+  bookQuery: BookQuery;
   onAddToCart: (book: Book) => void;
 }
 
 //destructuring BookGridProps
-function BookGrid({ searchQuery, onAddToCart }: BookGridProps) {
-  const { books, error, isLoading } = useBooks(searchQuery);
+function BookGrid({ bookQuery, onAddToCart }: BookGridProps) {
+  const { books, error, isLoading } = useBooks(bookQuery);
   const array = [1, 2, 3, 4, 5, 6];
 
   //if (searchQuery==="") return <Text>Effectuez une recherche.</Text>;
   if (error) return <Text>Une erreur s'est produite. Réessayez.</Text>;
-  
+
   return (
     <SimpleGrid
       columns={{
@@ -36,10 +38,13 @@ function BookGrid({ searchQuery, onAddToCart }: BookGridProps) {
             <BookCardSkeleton key={skeleton}/>
           // </GameCardContainer>
         ))}
+        
       {books &&
         (books as Book[]).map((book) => (
           // <GameCardContainer>
+          <Link to={'/books' + book.key} key={book.key}>
             <BookCard key={book.key} book={book} onAddToCart={onAddToCart} />
+          </Link>
           // </GameCardContainer>
         ))}
     </SimpleGrid>

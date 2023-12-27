@@ -7,32 +7,38 @@ import { RiShoppingBag2Fill } from "react-icons/ri";
 import { Input } from "@chakra-ui/react";
 import { Link, useLocation } from "react-router-dom";
 
-
 interface NavbarProps {
   onSearch: (query: string) => void;
   cartItemsCount: number;
 }
 
-
 function Navbar({ onSearch, cartItemsCount }: NavbarProps) {
-  
   const location = useLocation();
-  
-  const [value, setValue] = useState("Harry Potter");
 
-  if (location.pathname === '/cart') return (
-    <div className="navbar">
-    <div className="logo">
-      <img src={logo} className="logo-img" alt="logo" />
-    </div>
-    </div>
-  )
+  const [value, setValue] = useState("");
+
+  if (location.pathname === "/cart")
+    return (
+      <div className="navbar">
+        <div className="logo">
+          <Link to="/">
+            <img src={logo} className="logo-img" alt="logo" />
+          </Link>
+        </div>
+      </div>
+    );
 
   return (
     <div className="navbar">
-      <div className="logo">
+      {/* <div className="logo">
         <img src={logo} className="logo-img" alt="logo" />
+      </div> */}
+      <div className="logo">
+        <Link to="/">
+          <img src={logo} className="logo-img" alt="logo" />
+        </Link>
       </div>
+
       {/* BEGIN SEARCH BAR */}
       <Input
         variant="filled"
@@ -41,8 +47,8 @@ function Navbar({ onSearch, cartItemsCount }: NavbarProps) {
         borderRadius={20}
         width="60vw"
         onChange={(e) => {
-            setValue(e.target.value);
-            onSearch(e.target.value)
+          setValue(e.target.value);
+          onSearch(e.target.value);
         }}
       />
 

@@ -6,15 +6,16 @@ import Cart from "./components/Cart";
 import { Book } from "./hooks/useBooks";
 import { Route, Routes } from "react-router-dom";
 import SubjectList from "./components/SubjectList";
+import BookDetails from "./components/BookDetails";
 
-interface BookQuery {
+export interface BookQuery {
   subject: string | null;
   searchInput: string | null;
 }
 
 function App() {
   //const [bookData, setBookData] = useState([]);
-  const [bookQuery, setBookQuery] = useState<BookQuery>({subject: null, searchInput: "Harry Potter"});
+  const [bookQuery, setBookQuery] = useState<BookQuery>({subject: null, searchInput: "latest"});
   // à modifier
   const [cartItems, setCartItems] = useState<Book[]>([]);
 
@@ -26,17 +27,17 @@ function App() {
   return (
     <>
       <Navbar
-        onSearch={(searchQuery) => setSearchQuery(searchQuery)}
+        onSearch={(searchInput) => setBookQuery({...bookQuery, searchInput})}
         cartItemsCount={cartItems.length}
       />
-      <SubjectList onSelectSubject={(searchQuery) => setSearchQuery(searchQuery)}/>
+      <SubjectList onSelectSubject={(subject) => setBookQuery({...bookQuery, subject})}/>
       <Routes>
         <Route
           path="/"
           element={
-            searchQuery && (
+            bookQuery && (
               <BookGrid
-                searchQuery={searchQuery}
+                bookQuery={bookQuery}
                 onAddToCart={(book) => setCartItems([...cartItems, book])}
               />
             )
@@ -52,6 +53,14 @@ function App() {
             />
           }
         />
+        <Route
+          //path={`/works/${book}`}
+          path="/books/works/:id"
+          element={
+            <BookDetails />
+          }
+        />
+
       </Routes>
     </>
   );
