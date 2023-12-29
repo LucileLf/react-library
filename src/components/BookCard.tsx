@@ -3,6 +3,7 @@ import "../stylesheets/BookCard.scss";
 import { Book } from "../hooks/useBooks";
 import noImage from '../assets/no-image-placeholder.webp'
 import { MdAddShoppingCart } from "react-icons/md";
+import { Link } from "react-router-dom";
 
 
 interface BookCardProps {
@@ -12,8 +13,12 @@ interface BookCardProps {
 
 function BookCard({ book, onAddToCart }: BookCardProps) {
   return (
+
   <Card width="300px">
-    <CardBody display='flex' flexDirection='column' alignItems='center' borderRadius={10} height="40vh" width="100%">
+    
+    <Link to={'/books' + book.key} key={book.key}>
+
+    <CardBody className="book" >
       <Image src={book.cover_i ? `https://covers.openlibrary.org/b/id/${book.cover_i}.jpg` : noImage } height='80%'></Image>
       <Heading fontSize="2xl" whiteSpace='normal'>{book.title}</Heading>
       <Flex flexDirection="column" alignItems="center" width="100%">
@@ -31,6 +36,9 @@ function BookCard({ book, onAddToCart }: BookCardProps) {
         <Button colorScheme='teal' size='sm' onClick={()=>onAddToCart(book)}> <MdAddShoppingCart /> </Button>
       </HStack>
     </CardBody>
+
+</Link>
+
   </Card>
   );
 }

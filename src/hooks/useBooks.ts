@@ -10,7 +10,8 @@ export interface Book {
     cover_i: string;
     author_name: string;
     ratings_average: number, 
-    ratings_count: number
+    ratings_count: number, 
+    first_publish_year: string
   }
 
 // interface FetchResponse<Book> {

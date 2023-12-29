@@ -42,9 +42,9 @@ function BookGrid({ bookQuery, onAddToCart }: BookGridProps) {
       {books &&
         (books as Book[]).map((book) => (
           // <GameCardContainer>
-          <Link to={'/books' + book.key} key={book.key}>
+          //<Link to={'/books' + book.key} key={book.key}>
             <BookCard key={book.key} book={book} onAddToCart={onAddToCart} />
-          </Link>
+          //</Link>
           // </GameCardContainer>
         ))}
     </SimpleGrid>

@@ -2,7 +2,7 @@ import React from "react";
 import useBooks, { Book } from "../hooks/useBooks";
 import { useParams } from "react-router-dom";
 import { BookQuery } from "../App";
-import { Card, CardBody, Image, Heading, Flex, HStack, Box, Text, Badge, Button } from "@chakra-ui/react";
+import { Card, CardBody, Image, Heading, Flex, Text, Badge, Button } from "@chakra-ui/react";
 import noImage from '../assets/no-image-placeholder.webp'
 import { MdAddShoppingCart } from "react-icons/md";
 
@@ -11,15 +11,15 @@ interface BookDetailsProps {
   }
 
 const BookDetails = ({onAddToCart}: BookDetailsProps) => {
-    const params = useParams();
-    const bookId = params.id;
+    const {id} = useParams();
   
-    const { books, error, isLoading } = useBooks({subject:"", searchInput: bookId || ""});
-//if loading...
-    if (!books) return <Text>Une erreur s'est produite. Réessayez.</Text>;
+    const { books, error, isLoading } = useBooks({subject:"", searchInput: id || ""});
+
+    if (isLoading) return <Text>Loading...</Text>;
+    if (error) return <Text>Une erreur s'est produite. Réessayez.</Text>;
+    if (!books ) return <Text>Une erreur s'est produite. Réessayez.</Text>;
     
     const book: Book = books[0];
-console.log(book);
 
     return (
 //<Image src={book.cover_i ? `https://covers.openlibrary.org/b/id/${book.cover_i}.jpg` : noImage } height='80%'></Image>

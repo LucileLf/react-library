@@ -1,7 +1,7 @@
 import SearchBar from "./SearchBar";
 import { useState } from "react";
 import "../stylesheets/Navbar.scss";
-import logo from "../logo.png";
+import logo from "../assets/logo.png";
 import { FaSearch } from "react-icons/fa";
 import { RiShoppingBag2Fill } from "react-icons/ri";
 import { Input } from "@chakra-ui/react";
