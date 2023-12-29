@@ -50,17 +50,20 @@ function App() {
         onSearch={(searchInput) => setBookQuery({...bookQuery, searchInput})}
         cartItemsCount={totalCartCount}
       />
-      <SubjectList onSelectSubject={(subject) => setBookQuery({...bookQuery, subject})}/>
+      
       <Routes>
         <Route
           path="/"
           element={
             bookQuery && (
+              <>
+              <SubjectList onSelectSubject={(subject) => setBookQuery({...bookQuery, subject})}/>
               <BookGrid
                 bookQuery={bookQuery}
                 // onAddToCart={(book) => setCartItems([...cartItems, book])}
                 onAddToCart={handleAddToCart}
               />
+              </>
             )
           }
         />
