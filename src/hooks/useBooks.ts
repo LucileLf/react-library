@@ -20,7 +20,7 @@ export interface Book {
 // }
 
 
-const useBooks = (bookQuery: BookQuery) => {
+const useBooks = (bookQuery: BookQuery, dependencies?: any[]) => {
     const [books, setBooks] = useState(null);
     const [ error, setError] = useState('');
     const [ isLoading, setLoading ] = useState(false);
@@ -51,7 +51,7 @@ const useBooks = (bookQuery: BookQuery) => {
             setError(err.message)
             setLoading(false)
         })
-    }, [bookQuery])
+    }, dependencies ? [...dependencies] : [])
     return { books, error, isLoading}
 }
 

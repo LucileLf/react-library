@@ -25,7 +25,7 @@ const BookDetails = ({ onAddToCart }: BookDetailsProps) => {
   const { books, error, isLoading } = useBooks({
     subject: "",
     searchInput: id,
-  });
+  }, []);
 
   if (error) return <Text>Une erreur s'est produite. Réessayez.</Text>;
   if (!books) return <Text>Une erreur s'est produite. Réessayez.</Text>;

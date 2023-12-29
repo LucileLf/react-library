@@ -14,7 +14,7 @@ interface BookGridProps {
 
 //destructuring BookGridProps
 function BookGrid({ bookQuery, onAddToCart }: BookGridProps) {
-  const { books, error, isLoading } = useBooks(bookQuery);
+  const { books, error, isLoading } = useBooks(bookQuery, [bookQuery]);
   const array = [1, 2, 3, 4, 5, 6];
 
   //if (searchQuery==="") return <Text>Effectuez une recherche.</Text>;
