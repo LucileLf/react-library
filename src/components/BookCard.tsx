@@ -12,8 +12,11 @@ interface BookCardProps {
 }
 
 function BookCard({ book, onAddToCart }: BookCardProps) {
+  const handleAddToCart = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault(); // Prevent the default link behavior
+    onAddToCart(book);
+  };
   return (
-
   <Card width="300px">
     
     <Link to={'/books' + book.key} key={book.key}>
@@ -33,7 +36,7 @@ function BookCard({ book, onAddToCart }: BookCardProps) {
           </Badge>
           {book.ratings_average ? `(${book.ratings_count} avis)` : "Soyez le premier à laisser votre avis"}
         </Box>
-        <Button colorScheme='teal' size='sm' onClick={()=>onAddToCart(book)}> <MdAddShoppingCart /> </Button>
+        <Button colorScheme='teal' size='sm' onClick={handleAddToCart}> <MdAddShoppingCart /> </Button>
       </HStack>
     </CardBody>
 
