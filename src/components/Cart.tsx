@@ -22,9 +22,7 @@ interface CartProps {
   onDelete: (book: Book)=>void;
   onClear: () => void;
 }
-
-//get cart content from backend
-
+      
 const Cart = ({ cartItems, cartItemsCount, onDelete, onClear }: CartProps) => {
   return (
     <>

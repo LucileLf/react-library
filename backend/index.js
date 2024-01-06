@@ -27,9 +27,12 @@ app.get("/books", (req, res) => {
 });
 
 
-
 app.get("/api/cart", (req, res) => {
-   
+    const q = "SELECT * FROM cartitems";
+    db.query(q, (err, data) =>  {
+        if (err) return res.json(err);
+        return res.json(data);
+    }) 
 })
 
 app.post("/api/add-to-cart", (req, res) => {

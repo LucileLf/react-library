@@ -21,8 +21,27 @@ export interface CartItem {
 function App() {
   //const [bookData, setBookData] = useState([]);
   const [bookQuery, setBookQuery] = useState<BookQuery>({subject: null, searchInput: "latest"});
-  // à modifier
+  
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+
+  //get cart content from backend
+  useEffect(() => {
+    fetch('http://localhost:3001/api/cart', {      
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then((response) => response.json())
+    .then((cartItems) => {
+      console.log(cartItems);
+      setCartItems(cartItems) // update the state
+    })
+    .catch((err) => {
+    console.error('Error adding to cart:', err);
+    }); 
+  }, []);
+
   const totalCartCount = cartItems.reduce((total, cartItem) => total + cartItem.quantity, 0);
 
   const handleDelete = (bookToDelete: Book) => {
