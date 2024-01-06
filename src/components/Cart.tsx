@@ -23,6 +23,8 @@ interface CartProps {
   onClear: () => void;
 }
 
+//get cart content from backend
+
 const Cart = ({ cartItems, cartItemsCount, onDelete, onClear }: CartProps) => {
   return (
     <>

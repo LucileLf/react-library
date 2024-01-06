@@ -31,16 +31,33 @@ function App() {
   };
 
   const handleAddToCart = (bookToAdd: Book) => {
+    //console.log(bookToAdd);
+    
     const existingCartItemIndex = cartItems.findIndex(
       (item) => item.book.key === bookToAdd.key
     );
-    if (existingCartItemIndex !== -1) { //if book exists in cart
+    if (existingCartItemIndex !== -1) {                     // if book exists in cart
       const updatedCartItems = [...cartItems];
       updatedCartItems[existingCartItemIndex].quantity += 1;
       setCartItems(updatedCartItems);
     } else {
       const updatedCartItems = [...cartItems, { book: bookToAdd, quantity: 1}]; 
-      setCartItems(updatedCartItems);
+      setCartItems(updatedCartItems);                       // add to cart
+      fetch('http://localhost:3001/api/add-to-cart', {      // send to backend
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        //credentials: 'include', 
+        body: JSON.stringify({ book: bookToAdd }),
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data.message); // Log the response from the server
+      })
+      .catch((err) => {
+        console.error('Error adding to cart:', err);
+      });
     }
   }
 
