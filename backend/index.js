@@ -26,8 +26,33 @@ app.get("/books", (req, res) => {
     });
 });
 
+app.get("/book-details/:bookId", (req, res) => {
+    const bookId = req.params.bookId;
+    console.log(`Received request to /book-details/:bookId for book ${bookId}`);
+  
+    const getBookDetailsQuery = 'SELECT * FROM books WHERE book_id = ?';
+  
+    db.query(getBookDetailsQuery, [bookId], (err, results) => {
+        console.log(results)
+        if (err) {
+        console.error('Error fetching book details:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+        return;
+      }
+  
+      if (results.length === 0) {
+        res.status(404).json({ error: 'Book not found' });
+        return;
+      }
+  
+      const bookDetails = results[0];
+      res.json(bookDetails);
+    });
+  });
 
-app.get("/api/cart", (req, res) => {
+
+app.get("/cartitems", (req, res) => {
+    console.log("fetching content from cart")
     const q = "SELECT * FROM cartitems";
     db.query(q, (err, data) =>  {
         if (err) return res.json(err);
@@ -35,8 +60,8 @@ app.get("/api/cart", (req, res) => {
     }) 
 })
 
-app.post("/api/add-to-cart", (req, res) => {
-    console.log('Received request to /api/add-to-cart');
+app.post("/add-to-cart", (req, res) => {
+    console.log('Received request to /add-to-cart');
     const { book } = req.body;
 
     let bookId;
@@ -118,6 +143,37 @@ app.post("/api/add-to-cart", (req, res) => {
             }
         });
     });
+});
+
+app.post("/delete-from-cart", (req, res) => {
+    console.log('Received request to /delete-from-cart');
+    const { cartItemToDelete } = req.body;
+    console.log(cartItemToDelete)
+               
+        const deleteCartItemQuery = 'DELETE FROM `cartitems` WHERE `cartitem_id` = ?';
+        db.query(deleteCartItemQuery, [cartItemToDelete.cartitem_id], (deleteErr) => {
+            if (deleteErr) {
+                console.error('Error deleting cart item:', deleteErr);
+                res.status(500).json({ error: 'Internal Server Error' });
+                return;
+            }
+            console.log('Cart item deleted from database');
+            res.status(200).json({ message: 'Cart item deleted successfully' });
+        });  
+
+        // // fetch the updated cart items from the database
+        // const fetchUpdatedCartItemsQuery = 'SELECT * FROM cartitems'; 
+
+        // db.query(fetchUpdatedCartItemsQuery, [], (fetchErr, updatedCartItems) => {
+        //     if (fetchErr) {
+        //         console.error('Error fetching updated cart items:', fetchErr);
+        //         res.status(500).json({ error: 'Internal Server Error' });
+        //         return;
+        //     }
+
+        //     // Send the updated cart items in the response
+        //     res.status(200).json(updatedCartItems);
+        // });
 });
 
 app.listen(3001, () => {

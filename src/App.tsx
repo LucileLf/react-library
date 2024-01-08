@@ -14,8 +14,10 @@ export interface BookQuery {
 }
 
 export interface CartItem {
-  book: Book;
+  cartitem_id: number;
   quantity: number;
+  book_id: number; 
+  book: Book; 
 }
 
 function App() {
@@ -26,7 +28,7 @@ function App() {
 
   //get cart content from backend
   useEffect(() => {
-    fetch('http://localhost:3001/api/cart', {      
+    fetch('http://localhost:3001/cartitems', {      
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -44,25 +46,83 @@ function App() {
 
   const totalCartCount = cartItems.reduce((total, cartItem) => total + cartItem.quantity, 0);
 
-  const handleDelete = (bookToDelete: Book) => {
-    const updatedCartItems = cartItems.filter((cartItem) => cartItem.book !== bookToDelete);
-    setCartItems(updatedCartItems);
+  const handleDelete = (cartItemToDelete: CartItem) => {
+    const updatedCartItems = cartItems.filter((cartItem) => cartItem !== cartItemToDelete);
+   
+      // udpate quantity in DB
+      console.log(cartItemToDelete);
+      
+
+      fetch('http://localhost:3001/delete-from-cart', {        // delete from cart in DB
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        //credentials: 'include', 
+        body: JSON.stringify({ cartItemToDelete }),
+      })
+        .then((response) => response.json())
+        .then(() => {
+          fetch('http://localhost:3001/cartitems', {        //fetch updated cart items from DB
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+          .then((response) => response.json())
+          .then((updatedCartItems) => {
+            setCartItems(updatedCartItems); // Update the state with the new cart items
+          })
+          .catch((err) => {
+            console.error('Error fetching updated cart items:', err);
+          });
+
+
+        // } else {
+        //     console.error('Invalid response format from server:', updatedCartItems);
+        // }
+        })
+        .catch((err) => {
+          console.error('Error fetching updated cart items:', err);
+        });
+
   };
 
   const handleAddToCart = (bookToAdd: Book) => {
-    //console.log(bookToAdd);
+    console.log(bookToAdd); //fetched from API {key , type, title, author_name, cover_i …}
+    console.log(cartItems); //fetched from back end {cartItem, quantity, book_id}
     
     const existingCartItemIndex = cartItems.findIndex(
-      (item) => item.book.key === bookToAdd.key
+      (item) => item.book?.key === bookToAdd.key
     );
-    if (existingCartItemIndex !== -1) {                     // if book exists in cart
+    console.log(existingCartItemIndex);
+    
+    if (existingCartItemIndex !== -1) {                     // if book exists in cart...
       const updatedCartItems = [...cartItems];
-      updatedCartItems[existingCartItemIndex].quantity += 1;
+      updatedCartItems[existingCartItemIndex].quantity += 1;// udpate quantity
       setCartItems(updatedCartItems);
-    } else {
-      const updatedCartItems = [...cartItems, { book: bookToAdd, quantity: 1}]; 
-      setCartItems(updatedCartItems);                       // add to cart
-      fetch('http://localhost:3001/api/add-to-cart', {      // send to backend
+      
+      fetch('http://localhost:3001/update-cartitems', {     // udpate quantity in DB
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        //credentials: 'include', 
+        body: JSON.stringify(updatedCartItems[existingCartItemIndex]),
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((err) => {
+        console.error('Error increasing quantity:', err);
+      });
+
+    } else {                                                // if book doesn't exist in cart...
+      console.log(bookToAdd);
+      // const updatedCartItems = [...cartItems, { book: bookToAdd, quantity: 1}]; 
+      // setCartItems(updatedCartItems);                       // add to cart
+      fetch('http://localhost:3001/add-to-cart', {        // add to cart in DB
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,13 +132,28 @@ function App() {
       })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data.message); // Log the response from the server
-      })
+        console.log(data);
+      }) 
       .catch((err) => {
         console.error('Error adding to cart:', err);
       });
-    }
+                                                            // in either case, fetch updated cart items from DB
+    fetch('http://localhost:3001/cartitems', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then((response) => response.json())
+    .then((updatedCartItems) => {
+      setCartItems(updatedCartItems);
+    })
+    .catch((err) => {
+      console.error('Error fetching updated cart items:', err);
+    });
   }
+  
+}
 
   return (
     <>
@@ -111,6 +186,7 @@ function App() {
               cartItemsCount={totalCartCount}
               onDelete={handleDelete}
               onClear={() => setCartItems([])}
+              setCartItems={setCartItems} 
             />
           }
         />
