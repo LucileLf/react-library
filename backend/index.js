@@ -55,6 +55,7 @@ app.get("/cartitems", (req, res) => {
     console.log("fetching content from cart")
     const q = "SELECT * FROM cartitems";
     db.query(q, (err, data) =>  {
+        console.log(data)
         if (err) return res.json(err);
         return res.json(data);
     }) 
@@ -145,21 +146,72 @@ app.post("/add-to-cart", (req, res) => {
     });
 });
 
+app.post("/change-cartitem-quantity", (req, res) => {
+    console.log("received request from /change-cartitem-quantity")
+    console.log(req.body.i);
+    console.log(req.body.cartItem);
+    //if req.body.cartItem.quantity === 1 and i === -1, delete cartItem
+        //'SELECT * FROM `cartitems` WHERE `book_id` = ?'; //AND `user_id` = ?';
+    //else change quantity
+    const changeCartItemQuantityQuery = 'UPDATE `cartitems` SET `quantity` = ? WHERE `book_id` = ?'; // AND `user_id` = ?
+    db.query(changeCartItemQuantityQuery, [(req.body.cartItem.quantity + req.body.i), req.body.cartItem.book_id], (updateErr, res) => {
+        if (updateErr) {
+            console.error('Error updating quantity', updateErr);
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
+        }
+        console.log(res);
+        console.log('Quantity changed in database');
+    })
+
+    // db.query(checkCartItemQuery, [bookId], (checkErr, cartResults) => {
+    //     if (checkErr) {
+    //         console.error('Error checking cart item:', checkErr);
+    //         res.status(500).json({ error: 'Internal Server Error' });
+    //         return;
+    //     }
+    //     if (cartResults.length > 0) {
+    //         const updateCartItemQuery = 'UPDATE `cartitems` SET `quantity` = `quantity` + 1 WHERE `book_id` = ?'; // AND `user_id` = ? 
+    //         const updateCartItemValues = [bookId];
+
+    //         db.query(updateCartItemQuery, updateCartItemValues, (updateErr) => {
+    //             if (updateErr) {
+    //                 console.error('Error updating cart item quantity:', updateErr);
+    //                 res.status(500).json({ error: 'Internal Server Error' });
+    //                 return;
+    //             }
+    //             console.log('Cart item quantity updated in database');
+    //         });
+})
+
 app.post("/delete-from-cart", (req, res) => {
     console.log('Received request to /delete-from-cart');
     const { cartItemToDelete } = req.body;
     console.log(cartItemToDelete)
-               
-        const deleteCartItemQuery = 'DELETE FROM `cartitems` WHERE `cartitem_id` = ?';
-        db.query(deleteCartItemQuery, [cartItemToDelete.cartitem_id], (deleteErr) => {
-            if (deleteErr) {
-                console.error('Error deleting cart item:', deleteErr);
-                res.status(500).json({ error: 'Internal Server Error' });
-                return;
-            }
-            console.log('Cart item deleted from database');
-            res.status(200).json({ message: 'Cart item deleted successfully' });
-        });  
+        
+        //if (cartItemToDelete.quantity === 1) { //if only one in cart
+            const deleteCartItemQuery = 'DELETE FROM `cartitems` WHERE `cartitem_id` = ?';
+            db.query(deleteCartItemQuery, [cartItemToDelete.cartitem_id], (deleteErr) => {
+                if (deleteErr) {
+                    console.error('Error deleting cart item:', deleteErr);
+                    res.status(500).json({ error: 'Internal Server Error' });
+                    return;
+                }
+                console.log('Cart item deleted from database');
+                res.status(200).json({ message: 'Cart item deleted successfully' });
+            });  
+        //} else {
+            // const deleteCartItemQuery = 'UPDATE `cartitems` SET `quantity` = ? WHERE `cartitem_id` = ?);'
+            // db.query(deleteCartItemQuery, [(cartItemToDelete.quantity - 1), cartItemToDelete.book_id], (deleteErr) => {
+            //     if (deleteErr) {
+            //         console.error('Error deleting cart item:', deleteErr);
+            //         res.status(500).json({ error: 'Internal Server Error' });
+            //         return;
+            //     }
+            //     console.log('Cart item quantity lowered in database');
+            //     res.status(200).json({ message: 'Cart item deleted successfully' });
+            // }) 
+        //}
 
         // // fetch the updated cart items from the database
         // const fetchUpdatedCartItemsQuery = 'SELECT * FROM cartitems'; 

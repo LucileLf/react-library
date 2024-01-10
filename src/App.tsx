@@ -7,6 +7,7 @@ import { Book } from "./hooks/useBooks";
 import { Route, Routes } from "react-router-dom";
 import SubjectList from "./components/SubjectList";
 import BookDetails from "./components/BookDetails";
+import Suggestions from "./components/Suggestions";
 
 export interface BookQuery {
   subject: string | null;
@@ -25,8 +26,18 @@ function App() {
   const [bookQuery, setBookQuery] = useState<BookQuery>({subject: null, searchInput: "latest"});
   
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-
   //get cart content from backend
+
+  //const totalCartCount = cartItems.reduce((total, cartItem) => total + cartItem.quantity, 0);
+  const [totalCartCount, setTotalCartCount] = useState<number>(0);
+
+  useEffect(() => {
+    // Recalculate totalCartCount whenever cartItems changes
+    const newTotalCartCount = cartItems.reduce((total, cartItem) => total + cartItem.quantity, 0);
+    setTotalCartCount(newTotalCartCount);
+  }, [cartItems]);
+
+  
   useEffect(() => {
     fetch('http://localhost:3001/cartitems', {      
       method: 'GET',
@@ -42,16 +53,12 @@ function App() {
     .catch((err) => {
     console.error('Error adding to cart:', err);
     }); 
-  }, []);
-
-  const totalCartCount = cartItems.reduce((total, cartItem) => total + cartItem.quantity, 0);
-
+  }, [totalCartCount]);
+  
   const handleDelete = (cartItemToDelete: CartItem) => {
     const updatedCartItems = cartItems.filter((cartItem) => cartItem !== cartItemToDelete);
    
-      // udpate quantity in DB
-      console.log(cartItemToDelete);
-      
+      console.log(cartItemToDelete);      
 
       fetch('http://localhost:3001/delete-from-cart', {        // delete from cart in DB
         method: 'POST',
@@ -87,6 +94,53 @@ function App() {
         });
 
   };
+
+  const handleQuantityChange = (cartItem: CartItem, i: number) => {   
+    fetch('http://localhost:3001/change-cartitem-quantity', {        // change quantity in DB
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ cartItem, i }),
+    })
+    .then((response) => response.json())
+    // .then((data) => {
+    //   console.log("hello", data);
+    // })
+    .then((updatedCartItems) => {
+      setCartItems(updatedCartItems);
+       // Update the state with the new cart items
+    })
+      // setCartItems((prevCartItems) => {
+      //   const updatedCartItems = prevCartItems.map((item) => {
+      //     if (item.cartitem_id === cartItem.cartitem_id) {
+      //       // Update the quantity for the specific cart item
+      //       return { ...item, quantity: item.quantity + i };
+      //     }
+      //     return item;
+      //   });
+      //   return updatedCartItems;
+      // });
+   
+      // fetch('http://localhost:3001/cartitems', {        //fetch updated cart items from DB
+      //   method: 'GET',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      // })
+      // .then((response) => response.json())
+      // .then((updatedCartItems) => {
+      //   console.log(updatedCartItems);
+        
+      //   setCartItems(updatedCartItems); // Update the state with the new cart items
+      // })
+      // } else {
+      //     console.error('Invalid response format from server:', updatedCartItems);
+      // }
+      .catch((err) => {
+        console.error('Error updating quantity:', err);
+      });
+  }
 
   const handleAddToCart = (bookToAdd: Book) => {
     console.log(bookToAdd); //fetched from API {key , type, title, author_name, cover_i …}
@@ -181,13 +235,15 @@ function App() {
         <Route
           path="/cart"
           element={
-            <Cart
+            <>
+              <Cart
               cartItems={cartItems}
               cartItemsCount={totalCartCount}
               onDelete={handleDelete}
               onClear={() => setCartItems([])}
-              setCartItems={setCartItems} 
-            />
+              setCartItems={setCartItems} />
+              <Suggestions />
+            </>
           }
         />
         <Route
