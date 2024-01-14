@@ -3,7 +3,6 @@ import mysql from "mysql";
 import cors from 'cors';
 
 const app = express();
-
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -11,12 +10,87 @@ const db = mysql.createConnection({
     database: "library"
 });
 
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+
 app.use(express.json({ limit: '10mb' }));
 app.use(cors());
+
+
 
 app.get("/", (req, res) => {
     res.json("hello this is the backend");
 });
+
+
+            /* USER AUTHENTICATION - TESTING ONLY */
+            app.get("/users", (req, res) => {
+                console.log("fetching users")
+                const q = "SELECT * from users";
+                db.query(q, (err, data) => {
+                    if (err) return res.json(err);
+                    return res.json(data);
+                })
+            });
+
+            app.post("/add-user", async (req, res) => {      //bcrypt requires async
+                console.log(req.body.email)
+                console.log(req.body.password)
+                const salt = await bcrypt.genSalt()
+                const hashedPassword = await bcrypt.hash(req.body.password, salt);
+                console.log(hashedPassword)
+                const q = "INSERT INTO `library`.`users` (`email`, `password`) VALUES (?, ?)";
+                const uservalues = [req.body.email, hashedPassword];
+                db.query(q, uservalues, (err, newuser) => {
+                    if (err) return res.json(err);
+                    return res.json(newuser);
+                })
+            });
+
+            app.post('/users/login', async (req, res) => {
+                // console.log('user', req.body)
+                // console.log('email', req.body.email)
+                // console.log('password', req.body.password)
+                try {
+                    const response = await fetch('http://localhost:3001/users', {
+                        method: 'GET',
+                        headers: {
+                        'Content-Type': 'application/json',
+                        },
+                    });
+
+                    if(!response.ok) {
+                        return res.status(400).send('Failed to fetch users');
+                    }
+
+                    const users = await response.json();
+                    console.log(users);
+                    const user = users.find(user => user.email === req.body.email )  //find in db the user that has the email
+                    if (user == null) {
+                        return res.status(400).send("Cannot find user")
+                    }
+                    try{
+                        //console.log("found matching user", user)
+                        //compare password:
+                        console.log(req.body.password)
+                        console.log(user.password)
+                        if(await bcrypt.compare(req.body.password, user.password)){
+                            return res.json('success');
+                        } else {
+                            return res.json('not allowed')
+                        }
+                    } catch {
+                        return res.status(500).send()
+                    }
+                } catch(err) {
+                    console.error('Error adding to cart:', err); 
+                    return res.status(500).send('Internal Server Error');
+                }
+            });
+
 
 app.get("/books", (req, res) => {
     const q = "SELECT * FROM books";

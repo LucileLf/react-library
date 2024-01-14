@@ -3,7 +3,7 @@
 .navbar{
     display: flex;
     flex-direction: row;
-    align-items: space-evenly;
+    justify-content: space-evenly !important;
     height: 20vh;
     background-color: $blue;
     .logo{

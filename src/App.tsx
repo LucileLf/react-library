@@ -8,6 +8,7 @@ import { Route, Routes } from "react-router-dom";
 import SubjectList from "./components/SubjectList";
 import BookDetails from "./components/BookDetails";
 import Suggestions from "./components/Suggestions";
+import LoginForm from "./components/LoginForm";
 
 export interface BookQuery {
   subject: string | null;
@@ -31,6 +32,8 @@ function App() {
   //const totalCartCount = cartItems.reduce((total, cartItem) => total + cartItem.quantity, 0);
   const [totalCartCount, setTotalCartCount] = useState<number>(0);
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
   useEffect(() => {
     // Recalculate totalCartCount whenever cartItems changes
     const newTotalCartCount = cartItems.reduce((total, cartItem) => total + cartItem.quantity, 0);
@@ -214,24 +217,34 @@ function App() {
       <Navbar
         onSearch={(searchInput) => setBookQuery({...bookQuery, searchInput})}
         cartItemsCount={totalCartCount}
+        setIsLoggedIn={setIsLoggedIn}
+        isLoggedIn={isLoggedIn}
       />
       
       <Routes>
         <Route
           path="/"
           element={
-            bookQuery && (
+            isLoggedIn && bookQuery ? (
+              //bookQuery && (
               <>
-              <SubjectList onSelectSubject={(subject) => setBookQuery({...bookQuery, subject})}/>
-              <BookGrid
-                bookQuery={bookQuery}
-                // onAddToCart={(book) => setCartItems([...cartItems, book])}
-                onAddToCart={handleAddToCart}
-              />
+                <SubjectList onSelectSubject={(subject) => setBookQuery({...bookQuery, subject})}/>
+                <BookGrid
+                  bookQuery={bookQuery}
+                  // onAddToCart={(book) => setCartItems([...cartItems, book])}
+                  onAddToCart={handleAddToCart}
+                />
               </>
-            )
-          }
-        />
+   ) : (
+  <LoginForm setIsLoggedIn={setIsLoggedIn} />
+   )
+}
+/>
+        {/* <Route
+          path="/login"
+          element={<LoginForm setIsLoggedIn={setIsLoggedIn} />}
+        /> */}
+        
         <Route
           path="/cart"
           element={

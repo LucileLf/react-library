@@ -1,21 +1,29 @@
 import SearchBar from "./SearchBar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../stylesheets/Navbar.scss";
 import logo from "../assets/logo.png";
 import { FaSearch } from "react-icons/fa";
 import { RiShoppingBag2Fill } from "react-icons/ri";
-import { Input } from "@chakra-ui/react";
+import { Input, Button, Stack } from "@chakra-ui/react";
 import { Link, useLocation } from "react-router-dom";
+import { debounce } from 'lodash';
 
 interface NavbarProps {
   onSearch: (query: string) => void;
   cartItemsCount: number;
+  isLoggedIn: boolean;
+  setIsLoggedIn: (isLoggedIn: boolean) => void;
 }
 
-function Navbar({ onSearch, cartItemsCount }: NavbarProps) {
+function Navbar({ onSearch, cartItemsCount, isLoggedIn, setIsLoggedIn }: NavbarProps) {
   const location = useLocation();
 
   const [value, setValue] = useState("");
+
+  //debounced function to call onSearch with the latest value
+  const debouncedSearch = debounce((searchValue) => {
+    onSearch(searchValue);
+  }, 1000);
 
   if (location.pathname === "/cart")
     return (
@@ -28,6 +36,7 @@ function Navbar({ onSearch, cartItemsCount }: NavbarProps) {
       </div>
     );
 
+    
   return (
     <div className="navbar">
       {/* <div className="logo">
@@ -47,8 +56,9 @@ function Navbar({ onSearch, cartItemsCount }: NavbarProps) {
         borderRadius={20}
         width="60vw"
         onChange={(e) => {
-          setValue(e.target.value);
-          onSearch(e.target.value);
+          const searchValue = e.target.value;
+          setValue(searchValue);
+          debouncedSearch(searchValue); // Call the debounced function
         }}
       />
 
@@ -65,12 +75,20 @@ function Navbar({ onSearch, cartItemsCount }: NavbarProps) {
             <FaSearch id="search-icon" />
         </div> */}
       {/* END SEARCH BAR */}
-      <Link to="/cart" id="cart-div">
-        <div className="cart">
-          <div className="item-count"> {cartItemsCount} </div>
-          <RiShoppingBag2Fill id="cart-icon" />
-        </div>
-      </Link>
+      {isLoggedIn &&
+      <Stack>
+        <Link to="/cart" id="cart-div">
+          <div className="cart">
+            <div className="item-count"> {cartItemsCount} </div>
+            <RiShoppingBag2Fill id="cart-icon" />
+          </div>
+        </Link>
+        <Link to="/">
+          <Button colorScheme='blue' className="submit-button" onClick={()=>setIsLoggedIn(false)}>
+            Déconnexion
+          </Button>
+        </Link>
+      </Stack>}
     </div>
   );
 }
